@@ -1,0 +1,12 @@
+{% load humanize zwp_shop_tags %}
+<dl>
+	<dt>Cart size:</dt>
+	<dd>{{ cart.size }}</dd>
+
+	<dt>Total cost:</dt>
+	<dd>{{ cart.total_cost|intcomma|currency }}</dd>
+</dl>
+<p>
+	<a href="#">View cart</a> |
+	<a href="#">Checkout!</a>
+</p>

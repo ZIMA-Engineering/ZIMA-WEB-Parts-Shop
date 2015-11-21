@@ -1,0 +1,10 @@
+<form class="zwp-part-form" action="{% url 'zwp_add_part' %}" method="post">
+	{% csrf_token %}
+	{% for hidden in form.part_form.hidden_fields %}
+		{{ hidden }}
+	{% endfor %}
+
+	{{ form.quantity }}
+	{{ part.unit }}
+	<input type="submit" value="Add">
+</form>
