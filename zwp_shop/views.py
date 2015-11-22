@@ -6,8 +6,6 @@ from .forms import ItemAddForm, CartItemFormSet
 from .utils import get_or_create_cart
 
 
-
-
 def cart_show(request):
     qs = get_or_create_cart(request.session).cartitem_set.all()
 
@@ -15,7 +13,8 @@ def cart_show(request):
         formset = CartItemFormSet(request.POST, queryset=qs)
 
         if formset.is_valid():
-            formset.save()
+            with transaction.atomic():
+                formset.save()
 
             return redirect('zwp_cart_show')
 
