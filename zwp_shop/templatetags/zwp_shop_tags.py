@@ -5,7 +5,7 @@ from django.conf import settings
 register = template.Library()
 
 
-@register.inclusion_tag('zwp_shop/cart.html', takes_context=True)
+@register.inclusion_tag('zwp_shop/cart_preview.html', takes_context=True)
 def zwp_cart(context):
     return context
 
