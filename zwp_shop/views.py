@@ -28,7 +28,7 @@ def cart_show(request):
 
 
 @transaction.atomic
-def add_part_to_cart(request):
+def cart_add(request):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
 
