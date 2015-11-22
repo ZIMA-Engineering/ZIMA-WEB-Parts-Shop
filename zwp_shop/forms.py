@@ -1,5 +1,6 @@
 from django import forms
 from django.forms.widgets import HiddenInput
+from django.forms import modelformset_factory
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.db import IntegrityError, transaction
@@ -39,7 +40,7 @@ class PartForm(forms.ModelForm):
         return data
 
 
-class ItemForm(forms.ModelForm):
+class ItemAddForm(forms.ModelForm):
     class Meta:
         model = CartItem
         fields = ('quantity',)
@@ -65,10 +66,10 @@ class ItemForm(forms.ModelForm):
             args = list(args)
             args.insert(0, data)
 
-        super(ItemForm, self).__init__(*args, initial=initial, **kwargs)
+        super(ItemAddForm, self).__init__(*args, initial=initial, **kwargs)
 
     def clean(self):
-        data = super(ItemForm, self).clean()
+        data = super(ItemAddForm, self).clean()
 
         if not self.part_form.instance.part.available:
             raise forms.ValidationError("part '{}' is not for sale".format(
@@ -80,7 +81,7 @@ class ItemForm(forms.ModelForm):
         return data
     
     def is_valid(self):
-        return self.part_form.is_valid() and super(ItemForm, self).is_valid() 
+        return self.part_form.is_valid() and super(ItemAddForm, self).is_valid() 
 
     def save(self):
         # Every part is in the database just once
@@ -111,3 +112,22 @@ class ItemForm(forms.ModelForm):
             item.touch()
 
         self.instance.cart.touch()
+
+
+class ItemEditForm(forms.ModelForm):
+    class Meta:
+        model = CartItem
+        fields = ('quantity',)
+
+    def __init__(self, *args, **kwargs):
+        super(ItemEditForm, self).__init__(*args, **kwargs)
+
+        self.part = self.instance.part.part
+
+
+CartItemFormSet = modelformset_factory(
+    CartItem,
+    form=ItemEditForm,
+    extra=0,
+    can_delete=True
+)

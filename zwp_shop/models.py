@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 import hashlib
 import os
+from zwp.models import Directory
 
 
 class EmptyCart:
@@ -56,6 +57,20 @@ class Part(models.Model):
 
     @property
     def part(self):
+        if hasattr(self, '_part'):
+            return self._part
+
+        self._part = None
+        d = Directory.from_path(self.ds_name, self.dir_path, load=True)
+
+        if not d:
+            return None
+        
+        for p in d.parts:
+            if p.name == self.name:
+                self._part = p
+                break
+        
         return self._part
 
     @part.setter
@@ -83,6 +98,10 @@ class CartItem(models.Model):
 
     class Meta:
         unique_together = (('cart', 'part'),)
+
+    @property
+    def total_cost(self):
+        return self.unit_cost * self.quantity
 
     def touch(self, save=True):
         self.updated_at = timezone.now()

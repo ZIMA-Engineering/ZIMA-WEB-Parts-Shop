@@ -1,5 +1,5 @@
 from zwp.models import Part
-from .forms import ItemForm
+from .forms import ItemAddForm
 
 
 part_methods = ['available', 'cart_form']
@@ -27,7 +27,7 @@ def cart_form(self):
     if hasattr(self, '_cart_form'):
         return self._cart_form
 
-    self._cart_form = ItemForm(initial={
+    self._cart_form = ItemAddForm(initial={
         'ds_name': self.ds.name,
         'dir_path': self._dir.full_path,
         'name': self._name,
