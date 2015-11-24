@@ -1,5 +1,5 @@
 {% extends "zwp_shop/base.html" %}
-{% load humanize zwp_tags zwp_shop_tags %}
+{% load i18n humanize zwp_tags zwp_shop_tags %}
 
 {% block content %}
 <h2>Cart contents</h2>
@@ -36,7 +36,11 @@
 				{% endif %}
 			{% endfor %}
 			<tr>
-				<td colspan="3"><input type="submit" value="Update"></td>
+				<td colspan="6">
+					<input type="submit" value="Update">
+					{% trans "or" %}
+					<a href="{% url 'zwp_order' %}"><button type="button">{% trans "Checkout" %}</button></a>
+				</td>
 			</tr>
 		</table>
 	</form>

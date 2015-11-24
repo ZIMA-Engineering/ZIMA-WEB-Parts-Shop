@@ -1,0 +1,77 @@
+{% extends "zwp_shop/order/base.html" %}
+{% load i18n humanize zwp_tags zwp_shop_tags %}
+
+{% block order_content %}
+<h2>{% trans "Billing information" %}</h2>
+<table>
+	{% for field in billing.billing %}
+		<tr>
+			<th>{{ field.label }}</th>
+			<td>{{ field.value }}</td>
+		</tr>
+	{% endfor %}
+</table>
+
+<h2>{% trans "Delivery address" %}</h2>
+{% if same_delivery_address %}
+	<p>{% trans "Same as billing address." %}</p>
+{% else %}
+	<table>
+		{% for field in billing.delivery %}
+			<tr>
+				<th>{{ field.label }}</th>
+				<td>{{ field.value }}</td>
+			</tr>
+		{% endfor %}
+	</table>
+{% endif %}
+
+<h2>{% trans "Ordered items" %}</h2>
+<table>
+	<tr>
+		<th>{% trans "Part" %}</th>
+		<th>{% trans "Thumbnail" %}</th>
+		<th>{% trans "Unit cost" %}</th>
+		<th>{% trans "Quantity" %}</th>
+		<th>{% trans "Total Cost" %}</th>
+	</tr>
+
+	{% for item in cart.cartitem_set.all %}
+		{% if item.part.part %}
+			{% with part=item.part.part %}
+				<tr>
+					<td>{{ part.label }}</td>
+					<td>
+						{% if part.thumbnail %}
+							<img src="{% zwp_static part.ds part.thumbnail %}" width="100">
+						{% endif %}
+					</td>
+					<td>{{ item.unit_cost|intcomma|currency }}</td>
+					<td>{{ item.quantity }} {{ part.unit }}</td>
+					<td>{{ item.total_cost|intcomma|currency }}</td>
+				</tr>
+			{% endwith %}
+		{% endif %}
+	{% endfor %}
+</table>
+
+<table>
+	<tr>
+		<th>{% trans "Shipping method" %}:</th>
+		<td>{{ shipping.label }} ({{ shipping.cost|intcomma|currency }})</td>
+	</tr>
+	<tr>
+		<th>{% trans "Payment method" %}:</th>
+		<td>{{ payment.label }} ({{ payment.cost|intcomma|currency }})</td>
+	</tr>
+	<tr>
+		<th>{% trans "Total cost" %}:</th>
+		<td>{{ total_cost|intcomma|currency }}</td>
+	</tr>
+</table>
+
+<h2>{% trans "Confirmation" %}</h2>
+<table>
+	{{ form }}
+</table>
+{% endblock %}

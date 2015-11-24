@@ -1,0 +1,17 @@
+{% extends "zwp_shop/order/base.html" %}
+{% load i18n %}
+
+{% block order_content %}
+<table>
+	<tr>
+		<td>
+			<h2>Shipping method</h2>
+			{{ form.shipping }}
+		</td>
+		<td>
+			<h2>Payment method</h2>
+			{{ form.payment }}
+		</td>
+	</tr>
+</table>
+{% endblock %}

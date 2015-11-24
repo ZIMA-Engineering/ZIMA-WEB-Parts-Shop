@@ -3,9 +3,12 @@ from django.forms.widgets import HiddenInput
 from django.forms import modelformset_factory
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as __
 from django.db import IntegrityError, transaction
+from form_utils.forms import BetterModelFormMetaclass, BetterModelForm
+from collections import OrderedDict
 from zwp.models import Directory
-from .models import Part, CartItem
+from .models import Part, CartItem, Order, Address, ADDRESS_ROLES
 
 
 class PartForm(forms.ModelForm):
@@ -41,6 +44,8 @@ class PartForm(forms.ModelForm):
 
 
 class ItemAddForm(forms.ModelForm):
+    quantity = forms.IntegerField(min_value=1)
+
     class Meta:
         model = CartItem
         fields = ('quantity',)
@@ -115,6 +120,8 @@ class ItemAddForm(forms.ModelForm):
 
 
 class ItemEditForm(forms.ModelForm):
+    quantity = forms.IntegerField(min_value=1)
+    
     class Meta:
         model = CartItem
         fields = ('quantity',)
@@ -131,3 +138,96 @@ CartItemFormSet = modelformset_factory(
     extra=0,
     can_delete=True
 )
+
+
+def settings_to_choices(s):
+    return [
+        (m['name'], '{} ({})'.format(
+            m['label'],
+            settings.ZWP_CURRENCY(m['cost'])
+        )) for m in s
+    ]
+
+
+class ShippingPaymentOrderForm(forms.Form):
+    shipping = forms.ChoiceField(
+        label=_('shipping'),
+        choices=settings_to_choices(settings.ZWP_SHIPPING),
+        widget=forms.RadioSelect
+    )
+    payment = forms.ChoiceField(
+        label=_('payment'),
+        choices=settings_to_choices(settings.ZWP_PAYMENT),
+        widget=forms.RadioSelect
+    )
+
+
+address_fields = (
+    ('full_name', lambda r: forms.CharField(label=_('full name'), max_length=255, required=r)),
+    ('street', lambda r: forms.CharField(label=_('street'), max_length=255, required=r)),
+    ('city', lambda r: forms.CharField(label=_('city'), max_length=255, required=r)),
+    ('postal_code', lambda r: forms.CharField(label=_('postal code'), max_length=5, required=r)),
+)
+
+
+def order_attr_names(t):
+    return ['_'.join([t, n]) for n, _ in address_fields]
+
+
+class MyMeta(BetterModelFormMetaclass):
+    def __new__(cls, name, bases, attrs):
+        for t, required in {'billing': True, 'delivery': False}.items():
+            for name, field in address_fields:
+                attrs[ '_'.join([t, name]) ] = field(required)
+
+        return super(MyMeta, cls).__new__(cls, name, bases, attrs)
+
+
+class BillingOrderForm(BetterModelForm, metaclass=MyMeta):
+    same_address = forms.BooleanField(
+        label=_('use the billing address'),
+        required=False,
+        initial=True
+    )
+
+    class Meta:
+        model = Order
+        fieldsets = [
+            ('billing', {
+                'legend': _('Billing information'),
+                'fields': order_attr_names('billing') + ['ic', 'email', 'phone']
+            }),
+            ('delivery', {
+                'legend': _('Delivery address'),
+                'fields': ['same_address'] + order_attr_names('delivery')
+            }),
+        ]
+        widgets = {
+            'ic': forms.TextInput
+        }
+
+    def clean(self):
+        data = super(BillingOrderForm, self).clean()
+        
+        if not data.get('same_address', False):
+            for f, _ in address_fields:
+                field_name = '_'.join(['delivery', f])
+
+                if field_name not in data or not data[field_name]:
+                    self.add_error(field_name, __('This field is required.'))
+
+    def to_address(self, role):
+        kwargs = {
+            'order': self.instance,
+            'role': role
+        }
+
+        for f, _ in address_fields:
+            kwargs[f] = self.cleaned_data['_'.join([role, f])]
+
+        return Address(**kwargs)
+        
+
+class ConfirmOrderForm(forms.Form):
+    note = forms.CharField(label=_('note'), widget=forms.Textarea, required=False)
+    confirm = forms.BooleanField(label=_('confirm'))

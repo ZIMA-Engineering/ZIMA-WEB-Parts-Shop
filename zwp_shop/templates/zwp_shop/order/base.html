@@ -1,0 +1,24 @@
+{% extends "zwp_shop/base.html" %}
+
+{% block content %}
+<p>Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
+
+<form action="" method="post">
+	{% csrf_token %}
+	{{ wizard.management_form }}
+	
+	{% block order_content %}
+	{% endblock %}
+	
+	{% if wizard.steps.prev %}
+		<button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">back</button>
+	{% endif %}
+
+	{% if wizard.steps.current == wizard.steps.last %}
+		<input type="submit" value="Finish order">
+
+	{% else %}
+		<input type="submit" value="Next">
+	{% endif %}
+</form>
+{% endblock %}

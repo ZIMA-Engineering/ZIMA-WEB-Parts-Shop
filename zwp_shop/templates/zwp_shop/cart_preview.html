@@ -7,6 +7,8 @@
 	<dd>{{ cart.total_cost|intcomma|currency }}</dd>
 </dl>
 <p>
-	<a href="{% url 'zwp_cart_show' %}">View cart</a> |
-	<a href="#">Checkout!</a>
+	<a href="{% url 'zwp_cart_show' %}">View cart</a>
+	{% if cart.size %}
+		| <a href="{% url 'zwp_order' %}">Checkout!</a>
+	{% endif %}
 </p>

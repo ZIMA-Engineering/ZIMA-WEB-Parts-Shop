@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import Sum, F
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, get_language
 import hashlib
 import os
 from zwp.models import Directory
@@ -111,7 +111,7 @@ class CartItem(models.Model):
 
 
 class Order(models.Model):
-    cart = models.ForeignKey(Cart)
+    cart = models.OneToOneField(Cart)
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
    
     ic = models.IntegerField(_('ic'), blank=True, null=True)
@@ -130,6 +130,26 @@ class Order(models.Model):
     payment_cost = models.PositiveIntegerField(_('payment cost'))
 
     total_cost = models.PositiveIntegerField(_('total cost'), default=0)
+    
+    def save(self, *args, **kwargs):
+        is_new = not self.pk
+
+        if is_new:
+            from .utils import get_shipping, get_payment
+
+            self.language = get_language()
+
+            shipping = get_shipping(self.shipping)
+            self.shipping_label = shipping['label']
+            self.shipping_cost = shipping['cost']
+
+            payment = get_payment(self.payment)
+            self.payment_label = payment['label']
+            self.payment_cost = payment['cost']
+
+            self.total_cost = self.cart.total_cost + self.shipping_cost + self.payment_cost
+
+        super(Order, self).save(*args, **kwargs)
 
 
 ADDRESS_ROLES = (
