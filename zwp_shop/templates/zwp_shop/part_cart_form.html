@@ -1,3 +1,4 @@
+{% load i18n %}
 <form class="zwp-part-form" action="{% url 'zwp_cart_add' %}" method="post">
 	{% csrf_token %}
 	{% for hidden in form.part_form.hidden_fields %}
@@ -6,5 +7,5 @@
 
 	{{ form.quantity }}
 	{{ part.unit }}
-	<input type="submit" value="Add">
+	<input type="submit" value="{% trans "Add" %}">
 </form>

@@ -1,4 +1,5 @@
 {% extends "zwp_shop/base.html" %}
+{% load i18n %}
 
 {% block content %}
 <p>Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
@@ -11,14 +12,14 @@
 	{% endblock %}
 	
 	{% if wizard.steps.prev %}
-		<button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">back</button>
+		<button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "Back" %}</button>
 	{% endif %}
 
 	{% if wizard.steps.current == wizard.steps.last %}
-		<input type="submit" value="Finish order">
+		<input type="submit" value="{% trans "Finish order" %}">
 
 	{% else %}
-		<input type="submit" value="Next">
+		<input type="submit" value="{% trans "Next" %}">
 	{% endif %}
 </form>
 {% endblock %}
