@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.utils import translation
+from django.utils.translation import get_language
 from .models import Cart
 
 
@@ -38,3 +40,22 @@ def get_payment(name):
             return s
 
     return None
+
+
+class replace_language:
+    """
+    Run a block of code with different active language.
+    """
+    def __init__(self, code):
+        self.code = code
+
+    def __enter__(self):
+        self.orig_code = get_language()
+        self.replaced = self.orig_code != self.code
+
+        if self.replaced:
+            translation.activate(self.code)
+
+    def __exit__(self, *_):
+        if self.replaced:
+            translation.activate(self.orig_code)

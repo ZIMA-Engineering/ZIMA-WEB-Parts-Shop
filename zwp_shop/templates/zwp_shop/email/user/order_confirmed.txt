@@ -1,0 +1,35 @@
+{% extends "zwp_shop/email/user/base.txt" %}
+{% load i18n humanize zwp_shop_tags %}
+
+{% block content %}
+{% blocktrans with t_order=order.pk %}Confirmation of order #{{ t_order }}{% endblocktrans %}
+
+{% trans "Billing information" %}:
+	{% trans "Full name" %}:   {{ order.billing.full_name }}
+	{% trans "Street" %}:      {{ order.billing.street }}
+	{% trans "City" %}:        {{ order.billing.city }}
+	{% trans "Postal code" %}: {{ order.billing.postal_code }}
+	{% trans "IC" %}:          {{ order.ic }}
+	{% trans "E-mail" %}:      {{ order.email }}
+	{% trans "Phone" %}:       {{ order.phone }}
+
+{% trans "Delivery address" %}:{% if order.has_same_delivery %}
+  {% trans "Same as billing address." %}{% else %}
+	{% trans "Full name" %}:   {{ order.delivery.full_name }}
+	{% trans "Street" %}:      {{ order.delivery.street }}
+	{% trans "City" %}:        {{ order.delivery.city }}
+	{% trans "Postal code" %}: {{ order.delivery.postal_code }}{% endif %}
+
+{% if order.note %}{% trans "Note" %}:
+  {{ order.note }}{% endif %}
+
+{% trans "Ordered products" %}:
+{% for item in order.cart.cartitem_set.all %}{% with part=item.part.part %}
+	{{ part.label }}   {{ item.quantity }} {{ part.unit }}    {{ item.total_cost|intcomma|currency }}
+{% endwith %}{% endfor %}
+
+{% trans "Payment" %}:     {{ order.payment_label }} {{ order.payment_cost|intcomma|currency }}
+{% trans "Shipping" %}:    {{ order.shipping_label }} {{ order.shipping_cost|intcomma|currency }}
+
+{% trans "Sum" %}:         {{ order.total_cost|intcomma|currency }}
+{% endblock %}

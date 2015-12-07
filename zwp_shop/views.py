@@ -6,6 +6,7 @@ from .models import Cart, Address, Order
 from .forms import ItemAddForm, CartItemFormSet, ShippingPaymentOrderForm, \
                    BillingOrderForm, ConfirmOrderForm
 from .utils import get_cart, get_or_create_cart, get_shipping, get_payment
+from .mail import new_order as mail_new_order
 
 
 def cart_show(request):
@@ -113,6 +114,8 @@ class OrderWizard(SessionWizardView):
 
         if not billing_form.cleaned_data['same_address']:
             billing_form.to_address('delivery').save()
+
+        mail_new_order(self.request, order)
 
         del self.request.session['zwp_cart']
 

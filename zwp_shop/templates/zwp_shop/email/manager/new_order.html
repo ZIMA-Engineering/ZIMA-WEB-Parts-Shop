@@ -1,0 +1,111 @@
+{% extends "zwp_shop/email/manager/base.html" %}
+{% load i18n humanize zwp_shop_tags %}
+
+{% block title %}
+	{% blocktrans with t_order=order.pk %}New order #{{ t_order }}{% endblocktrans %}
+{% endblock %}
+		
+{% block content %}
+	<h1>
+		{% blocktrans with t_order=order.pk trimmed %}
+			New order #{{ t_order }}
+		{% endblocktrans %}
+	</h1>
+
+	<h2>{% trans "Billing information" %}:</h2>
+	<table>
+		<tr>
+			<th>{% trans "Full name" %}:</th>
+			<td>{{ order.billing.full_name }}</td>
+		</tr>
+		<tr>
+			<th>{% trans "Street" %}:</th>
+			<td>{{ order.billing.street }}</td>
+		</tr>
+		<tr>
+			<th>{% trans "City" %}:</th>
+			<td>{{ order.billing.city }}</td>
+		</tr>
+		<tr>
+			<th>{% trans "Postal code" %}:</th>
+			<td>{{ order.billing.postal_code }}</td>
+		</tr>
+		<tr>
+			<th>{% trans "IC" %}:</th>
+			<td>{{ order.ic }}</td>
+		</tr>
+		<tr>
+			<th>{% trans "E-mail" %}:</th>
+			<td>{{ order.email }}</td>
+		</tr>
+		<tr>
+			<th>{% trans "Phone" %}:</th>
+			<td>{{ order.phone }}</td>
+		</tr>
+	</table>
+
+	<h2>{% trans "Delivery address" %}:</h2>
+	{% if order.has_same_delivery %}
+		{% trans "Same as billing address." %}
+
+	{% else %}
+		<table>
+			<tr>
+				<th>{% trans "Full name" %}:</th>
+				<td>{{ order.delivery.full_name }}</td>
+			</tr>
+			<tr>
+				<th>{% trans "Street" %}:</th>
+				<td>{{ order.delivery.street }}</td>
+			</tr>
+			<tr>
+				<th>{% trans "City" %}:</th>
+				<td>{{ order.delivery.city }}</td>
+			</tr>
+			<tr>
+				<th>{% trans "Postal code" %}:</th>
+				<td>{{ order.delivery.postal_code }}</td>
+			</tr>
+		</table>
+	{% endif %}
+	
+	{% if order.note %}
+		<h2>{% trans "Note" %}:</h2>
+		<p>{{ order.note|linebreaksbr }}</p>
+	{% endif %}
+
+	<h2>{% trans "Ordered products" %}:</h2>
+	<table>
+		<tr>
+			<th>{% trans "Part" %}</th>
+			<th>{% trans "Unit cost" %}</th>
+			<th>{% trans "Quantity" %}</th>
+			<th>{% trans "Cost" %}</th>
+		</tr>
+		{% for item in order.cart.cartitem_set.all %}
+			{% with part=item.part.part %}
+				<tr>
+					<td>{{ part.label }}</td>
+					<td>{{ item.unit_cost|intcomma|currency }}</td>
+					<td>{{ item.quantity }} {{ part.unit }}</td>
+					<td>{{ item.total_cost|intcomma|currency }}</td>
+				</tr>
+			{% endwith %}
+		{% endfor %}
+	</table>
+
+	<table>
+		<tr>
+			<th>{% trans "Payment" %}:</th>
+			<td>{{ order.payment_label }} {{ order.payment_cost|intcomma|currency }}</td>
+		</tr>
+		<tr>
+			<th>{% trans "Shipping" %}:</th>
+			<td>{{ order.shipping_label }} {{ order.shipping_cost|intcomma|currency }}</td>
+		</tr>
+		<tr>
+			<th>{% trans "Sum" %}:</th>
+			<td>{{ order.total_cost|intcomma|currency }}</td>
+		</tr>
+	</table>
+{% endblock %}

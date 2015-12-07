@@ -151,6 +151,30 @@ class Order(models.Model):
 
         super(Order, self).save(*args, **kwargs)
 
+    @property
+    def billing(self):
+        if getattr(self, '_billing', False):
+            return self._billing
+
+        self._billing = self.address_set.get(role='billing')
+        return self._billing
+
+    @property
+    def delivery(self):
+        if getattr(self, '_delivery', False):
+            return self._delivery
+
+        try:
+            self._delivery = self.address_set.get(role='delivery')
+
+        except Address.DoesNotExist:
+            self._delivery = self.billing
+
+        return self._delivery
+
+    def has_same_delivery(self):
+        return self.billing == self.delivery
+
 
 ADDRESS_ROLES = (
     ('billing', _('billing address')),
