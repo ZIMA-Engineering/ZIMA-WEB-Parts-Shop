@@ -2,49 +2,51 @@
 {% load i18n humanize zwp_tags zwp_shop_tags %}
 
 {% block content %}
-<h2>Cart contents</h2>
-{% if cart.size %}
-<form action="{% url 'zwp_cart_show' %}" method="post">
-		{% csrf_token %}
-		{{ formset.management_form }}
-		<table>
-			<tr>
-				<th>Part</th>
-				<th>Thumbnail</th>
-				<th>Unit cost</th>
-				<th>Quantity</th>
-				<th>Total Cost</th>
-				<th>Remove</th>
-			</tr>
-			{% for form in formset %}
-				{% if form.part %}
-					<tr>
-						<td>{{ form.part.label }}</td>
-						<td>
-							{% if form.part.thumbnail %}
-								<img src="{% zwp_static form.part.ds form.part.thumbnail %}" width="100">
-							{% endif %}
-						</td>
-						<td>{{ form.instance.unit_cost|intcomma|currency }}</td>
-						<td>
-							{{ form.id }}
-							{{ form.quantity }} {{ form.part.unit }}
-						</td>
-						<td>{{ form.instance.total_cost|intcomma|currency }}</td>
-						<td>{{ form.DELETE }}</td>
-					</tr>
-				{% endif %}
-			{% endfor %}
-			<tr>
-				<td colspan="6">
-					<input type="submit" value="Update">
-					{% trans "or" %}
-					<a href="{% url 'zwp_order' %}"><button type="button">{% trans "Checkout" %}</button></a>
-				</td>
-			</tr>
-		</table>
-	</form>
-{% else %}
-	<p>Your cart is empty.</p>
-{% endif %}
+<div class="zwp-cart">
+	<h2>{% trans "Cart contents" %}</h2>
+	{% if cart.size %}
+		<form action="{% url 'zwp_cart_show' %}" method="post">
+			{% csrf_token %}
+			{{ formset.management_form }}
+			<table>
+				<tr>
+					<th>{% trans "Part" %}</th>
+					<th>{% trans "Thumbnail" %}</th>
+					<th class="unit-cost">{% trans "Unit cost" %}</th>
+					<th class="quantity">{% trans "Quantity" %}</th>
+					<th class="total-cost">{% trans "Total cost" %}</th>
+					<th>{% trans "Remove" %}</th>
+				</tr>
+				{% for form in formset %}
+					{% if form.part %}
+						<tr>
+							<td>{{ form.part.label }}</td>
+							<td>
+								{% if form.part.thumbnail %}
+									<img src="{% zwp_static form.part.ds form.part.thumbnail %}" width="100">
+								{% endif %}
+							</td>
+							<td class="unit-cost">{{ form.instance.unit_cost|intcomma|currency }}</td>
+							<td class="quantity">
+								{{ form.id }}
+								{{ form.quantity }} {{ form.part.unit }}
+							</td>
+							<td class="total-cost">{{ form.instance.total_cost|intcomma|currency }}</td>
+							<td>{{ form.DELETE }}</td>
+						</tr>
+					{% endif %}
+				{% endfor %}
+				<tr class="submit">
+					<td colspan="6">
+						<input type="submit" value="Update">
+						{% trans "or" %}
+						<a href="{% url 'zwp_order' %}"><button type="button">{% trans "Checkout" %}</button></a>
+					</td>
+				</tr>
+			</table>
+		</form>
+	{% else %}
+	<p>{% trans "Your cart is empty." %}</p>
+	{% endif %}
+</div>
 {% endblock %}

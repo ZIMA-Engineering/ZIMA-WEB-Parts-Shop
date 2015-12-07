@@ -1,14 +1,16 @@
 {% load i18n humanize zwp_shop_tags %}
+<h2>{% trans "Shopping cart" %}</h2>
+
 <dl>
-	<dt>Cart size:</dt>
+	<dt>{% trans "Cart size" %}:</dt>
 	<dd>{{ cart.size }}</dd>
 
-	<dt>Total cost:</dt>
+	<dt>{% trans "Total cost" %}:</dt>
 	<dd>{{ cart.total_cost|intcomma|currency }}</dd>
 </dl>
-<p>
-<a href="{% url 'zwp_cart_show' %}">{% trans "View cart" %}</a>
-	{% if cart.size %}
-	| <a href="{% url 'zwp_order' %}">{% trans "Checkout" %}</a>
-	{% endif %}
-</p>
+
+<p class="cart-view"><a href="{% url 'zwp_cart_show' %}">{% trans "View cart" %}</a></p>
+
+{% if cart.size %}
+	<p class="cart-checkout"><a href="{% url 'zwp_order' %}">{% trans "Checkout" %}</a></p>
+{% endif %}
