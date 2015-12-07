@@ -163,10 +163,10 @@ class ShippingPaymentOrderForm(forms.Form):
 
 
 address_fields = (
-    ('full_name', lambda r: forms.CharField(label=_('full name'), max_length=255, required=r)),
-    ('street', lambda r: forms.CharField(label=_('street'), max_length=255, required=r)),
-    ('city', lambda r: forms.CharField(label=_('city'), max_length=255, required=r)),
-    ('postal_code', lambda r: forms.CharField(label=_('postal code'), max_length=5, required=r)),
+    ('full_name', lambda r: forms.CharField(label=_('Full name'), max_length=255, required=r)),
+    ('street', lambda r: forms.CharField(label=_('Street'), max_length=255, required=r)),
+    ('city', lambda r: forms.CharField(label=_('City'), max_length=255, required=r)),
+    ('postal_code', lambda r: forms.CharField(label=_('Postal code'), max_length=5, required=r)),
 )
 
 
@@ -185,7 +185,7 @@ class MyMeta(BetterModelFormMetaclass):
 
 class BillingOrderForm(BetterModelForm, metaclass=MyMeta):
     same_address = forms.BooleanField(
-        label=_('use the billing address'),
+        label=_('Use the billing address'),
         required=False,
         initial=True
     )
@@ -229,5 +229,5 @@ class BillingOrderForm(BetterModelForm, metaclass=MyMeta):
         
 
 class ConfirmOrderForm(forms.Form):
-    note = forms.CharField(label=_('note'), widget=forms.Textarea, required=False)
-    confirm = forms.BooleanField(label=_('confirm'))
+    note = forms.CharField(label=_('Note'), widget=forms.Textarea, required=False)
+    confirm = forms.BooleanField(label=_('Confirm'))
