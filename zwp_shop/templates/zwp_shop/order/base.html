@@ -1,10 +1,10 @@
 {% extends "zwp_shop/base.html" %}
-{% load i18n %}
+{% load i18n zwp_shop_tags %}
 
 {% block content %}
-<p>Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
+{% zwp_order_steps %}
 
-<form action="" method="post">
+<form class="zwp-order step-{{ wizard.steps.current }}" action="" method="post">
 	{% csrf_token %}
 	{{ wizard.management_form }}
 	

@@ -1,0 +1,10 @@
+<div class="zwp-order-steps">
+	<ol>
+		{% for step in steps %}
+			<li class="{% if step.0 == current_step %}active{% endif %}">
+				{{ step.1 }}
+			</li>
+		{% endfor %}
+	</ol>
+	<br class="cleaner">
+</div>
